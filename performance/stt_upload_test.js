@@ -6,7 +6,7 @@ export const options = {
   duration: '20s',
 };
 
-const audioData = open('./performance/techno.m4a', 'b');
+const audioData = open('./techno.m4a', 'b');
 
 export default function () {
   const url = 'http://127.0.0.1:8000/stt/upload/';
