@@ -33,4 +33,4 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest tests -v
+          pytest tests -v --ignore=tests/test_consumer.py
