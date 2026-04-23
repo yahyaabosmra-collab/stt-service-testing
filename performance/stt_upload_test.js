@@ -6,25 +6,27 @@ export const options = {
   duration: '20s',
 };
 
-const audioData = open('./تكنولوجيا.m4a', 'b');
+const audioData = open('./performance/techno.m4a', 'b');
 
 export default function () {
-  const url = 'http://127.0.0.1:8005/stt/upload/';
+  const url = 'http://127.0.0.1:8000/stt/upload/';
 
   const payload = {
-    audio: http.file(audioData, 'تكنولوجيا.m4a', 'audio/mp4'),
+    audio: http.file(audioData, 'techno.m4a', 'audio/mp4'),
   };
 
-  const res = http.post(url, payload);
+  const params = {
+    headers: {
+      'X-Student-ID': 'student-123',
+      'X-User-ID': 'user-123',
+    },
+  };
 
-  const ok = check(res, {
+  const res = http.post(url, payload, params);
+
+  check(res, {
     'status is 202': (r) => r.status === 202,
   });
-
-  if (!ok) {
-    console.log(`STATUS: ${res.status}`);
-    console.log(`BODY: ${res.body}`);
-  }
 
   sleep(1);
 }
