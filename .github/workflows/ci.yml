@@ -94,3 +94,19 @@ jobs:
       - name: Run performance test
         run: |
           k6 run performance/stt_upload_test.js
+
+  gitleaks:
+    name: Run GitLeaks Security Scan
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run GitLeaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
