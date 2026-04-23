@@ -21,14 +21,21 @@ def audio_file():
     )
 
 
+@patch("stt.views.get_user_from_headers")
 @patch("stt.views.send_job_to_queue")
 @patch("stt.views.create_stt_job")
 def test_upload_then_check_status_flow(
     mock_create_job,
     mock_send_job,
+    mock_get_user_from_headers,
     client,
     audio_file,
 ):
+    mock_get_user_from_headers.return_value = {
+        "student_id": "student-123",
+        "user_id": "user-123",
+    }
+
     # Step 1: Upload audio
     upload_response = client.post(
         "/stt/upload/",
@@ -43,6 +50,8 @@ def test_upload_then_check_status_flow(
     with patch("stt.views.get_job_by_id") as mock_get_job:
         mock_get_job.return_value = {
             "job_id": job_id,
+            "student_id": "student-123",
+            "user_id": "user-123",
             "status": "completed",
             "raw_transcript": "raw text",
             "cleaned_transcript": "clean text",
@@ -58,3 +67,5 @@ def test_upload_then_check_status_flow(
         assert data["status"] == "completed"
         assert data["raw_transcript"] == "raw text"
         assert data["cleaned_transcript"] == "clean text"
+
+        mock_get_job.assert_called_once_with(job_id, "student-123")

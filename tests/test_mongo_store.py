@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from stt.mongo_store import (
     create_stt_job,
@@ -13,6 +13,8 @@ from stt.mongo_store import (
 def test_create_stt_job_inserts_expected_document(mock_collection):
     create_stt_job(
         job_id="job-123",
+        student_id="student-123",
+        user_id="user-123",
         original_file_name="lecture.wav",
         local_file_path="/tmp/uploads/job-123.wav",
     )
@@ -21,6 +23,8 @@ def test_create_stt_job_inserts_expected_document(mock_collection):
     inserted_doc = mock_collection.insert_one.call_args.args[0]
 
     assert inserted_doc["job_id"] == "job-123"
+    assert inserted_doc["student_id"] == "student-123"
+    assert inserted_doc["user_id"] == "user-123"
     assert inserted_doc["original_file_name"] == "lecture.wav"
     assert inserted_doc["local_file_path"] == "/tmp/uploads/job-123.wav"
     assert inserted_doc["status"] == "queued"
@@ -95,15 +99,16 @@ def test_mark_job_failed_sets_failed_status_and_error_message(mock_collection):
 def test_get_job_by_id_returns_document_without_id(mock_collection):
     mock_collection.find_one.return_value = {
         "job_id": "job-321",
+        "student_id": "student-123",
         "status": "completed",
         "raw_transcript": "raw",
         "cleaned_transcript": "clean",
     }
 
-    result = get_job_by_id("job-321")
+    result = get_job_by_id("job-321", "student-123")
 
     mock_collection.find_one.assert_called_once_with(
-        {"job_id": "job-321"},
+        {"job_id": "job-321", "student_id": "student-123"},
         {"_id": 0},
     )
     assert result["job_id"] == "job-321"
@@ -114,10 +119,10 @@ def test_get_job_by_id_returns_document_without_id(mock_collection):
 def test_get_job_by_id_returns_none_when_job_not_found(mock_collection):
     mock_collection.find_one.return_value = None
 
-    result = get_job_by_id("missing-job")
+    result = get_job_by_id("missing-job", "student-123")
 
     mock_collection.find_one.assert_called_once_with(
-        {"job_id": "missing-job"},
+        {"job_id": "missing-job", "student_id": "student-123"},
         {"_id": 0},
     )
     assert result is None
