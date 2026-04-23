@@ -9,7 +9,7 @@ export const options = {
 const audioData = open('./techno.m4a', 'b');
 
 export default function () {
-  const url = 'http://127.0.0.1:8000/stt/upload/';
+  const url = 'http://127.0.0.1:8007/stt/upload/';
 
   const payload = {
     audio: http.file(audioData, 'techno.m4a', 'audio/mp4'),
